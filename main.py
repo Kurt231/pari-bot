@@ -9,6 +9,9 @@ from aiogram import F
 from userstates import UserStates
 from keyboardhelper import keyboards
 
+
+import pariservice as ps
+
 from config import TOKEN
 
 storage = MemoryStorage()
@@ -29,13 +32,18 @@ async def start(message: types.Message):
 
 @dp.message(F.text == "Мои пари", StateFilter(UserStates.BASE))
 async def my_paris(message: types.Message):
-    await message.answer("Твои пари")
+    text = "Твои пари"
+    paris = ps.get_paris(message.from_user.id)
+    for pari in paris:
+        text += "\n" + pari
+    await message.answer(text)
 
 
 
 @dp.message(F.text == "Создать пари", StateFilter(UserStates.BASE))
 async def add_pari(message: types.Message):
-    await message.answer("Функционал ещё в разработке")
+    text = ps.add_pari(message.from_user.id, message.text)
+    await message.answer(text)
 
 
 
