@@ -12,7 +12,7 @@ from config import TOKEN
 
 storage = MemoryStorage()
 bot = Bot(token=TOKEN)
-dp = Dispatcher()
+dp = Dispatcher(storage=storage)
 
 
 @dp.message(Command("start"))
