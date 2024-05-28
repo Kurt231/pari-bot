@@ -14,6 +14,7 @@ import pariservice as ps
 
 from config import TOKEN
 import storage.user_repository as user_storage
+import storage.pari_repository as pari_storage
 
 storage = MemoryStorage()
 bot = Bot(token=TOKEN)
@@ -53,6 +54,7 @@ async def add_pari(message: types.Message, state: FSMContext):
 
 @dp.message(StateFilter(UserStates.CREATING_PARI))
 async def set_pari_name(message: types.Message, state: FSMContext):
+    pari_storage.add_pari(message.text, message.from_user.username)
     text = ps.set_pari_taker()
     await message.answer(text)
     await state.set_state(UserStates.SETTING_PARI_TAKER)
@@ -60,9 +62,12 @@ async def set_pari_name(message: types.Message, state: FSMContext):
 
 @dp.message(StateFilter(UserStates.SETTING_PARI_TAKER))
 async def set_pari_name(message: types.Message, state: FSMContext):
+    pari = pari_storage.set_pari_taker(message.from_user.username, message.text)
     text = ps.pari_created()
+    taker_text = "Пользователь" + pari.challenger_name + "заключил с вами пари: " + pari.name
     await message.answer(text)
     await state.set_state(UserStates.BASE)
+    await bot.send_message(user_storage.get_user(pari.taker_name))
 
 
 
